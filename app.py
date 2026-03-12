@@ -11,9 +11,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# 자동 새로고침
-st_autorefresh = st.empty()
-
 # 배너 이미지
 st.image(
     "https://images.unsplash.com/photo-1640161704729-cbe966a08476",
@@ -31,22 +28,20 @@ params = {
     "vs_currency": "krw",
     "order": "market_cap_desc",
     "per_page": 10,
-    "page": 1,
-    "sparkline": True
+    "page": 1
 }
 
 data = requests.get(url, params=params).json()
 
 df = pd.DataFrame(data)
 
-# 필요한 컬럼 정리
+# 필요한 컬럼만 선택
 coins = df[[
     "name",
     "symbol",
     "image",
     "current_price",
-    "price_change_percentage_24h",
-    "sparkline_in_7d"
+    "price_change_percentage_24h"
 ]]
 
 st.divider()
@@ -63,7 +58,7 @@ st.subheader("🔥 TOP 코인")
 cols = st.columns(5)
 
 for i, row in coins.head(5).iterrows():
-    with cols[i % 5]:
+    with cols[i]:
         st.image(row["image"], width=50)
         st.metric(
             label=row["name"],
@@ -74,33 +69,13 @@ for i, row in coins.head(5).iterrows():
 cols2 = st.columns(5)
 
 for i, row in coins.iloc[5:10].iterrows():
-    with cols2[i % 5]:
+    with cols2[i]:
         st.image(row["image"], width=50)
         st.metric(
             label=row["name"],
             value=f"{row['current_price']:,} KRW",
             delta=f"{row['price_change_percentage_24h']:.2f}%"
         )
-
-st.divider()
-
-# 가격 그래프
-st.subheader("📈 코인 가격 트렌드")
-
-selected_coin = st.selectbox(
-    "그래프 확인 코인 선택",
-    coins["name"]
-)
-
-coin_data = coins[coins["name"] == selected_coin]
-
-spark = coin_data.iloc[0]["sparkline_in_7d"]["price"]
-
-chart_df = pd.DataFrame({
-    "price": spark
-})
-
-st.line_chart(chart_df)
 
 st.divider()
 
