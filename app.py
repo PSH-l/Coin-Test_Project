@@ -90,15 +90,20 @@ coin_data = df[df["name"] == selected_coin]
 
 if not coin_data.empty:
 
-    spark = coin_data.iloc[0]["sparkline_in_7d"]["price"]
+    coin_row = coin_data.iloc[0]
 
-    chart_df = pd.DataFrame({
-        "price": spark
-    })
+    if "sparkline_in_7d" in coin_row and coin_row["sparkline_in_7d"]:
 
-    st.line_chart(chart_df)
+        spark = coin_row["sparkline_in_7d"]["price"]
 
-st.divider()
+        chart_df = pd.DataFrame({
+            "price": spark
+        })
+
+        st.line_chart(chart_df)
+
+    else:
+        st.warning("이 코인의 가격 그래프 데이터를 불러올 수 없습니다.")
 
 # 거래량 그래프
 st.subheader("💸 거래량")
