@@ -11,7 +11,6 @@ st.set_page_config(
 )
 
 st.title("💰 실시간 암호화폐 대시보드")
-
 st.write("CoinGecko API 기반 코인 정보")
 
 # API 캐싱 (60초)
@@ -105,14 +104,19 @@ if not coin_data.empty:
     else:
         st.warning("이 코인의 가격 그래프 데이터를 불러올 수 없습니다.")
 
+st.divider()
+
 # 거래량 그래프
 st.subheader("💸 거래량")
 
 volume_df = df[["name", "total_volume"]]
-
 volume_df.columns = ["Coin", "Volume"]
 
-st.bar_chart(volume_df.set_index("Coin"))
+# 코인 이름을 인덱스로 설정
+volume_df = volume_df.set_index("Coin")
+
+# 그래프 표시
+st.bar_chart(volume_df)
 
 st.divider()
 
@@ -134,6 +138,9 @@ table_df.columns = [
     "24h Change (%)",
     "Volume"
 ]
+
+# 인덱스를 1부터 시작하도록 수정
+table_df.index = range(1, len(table_df) + 1)
 
 st.dataframe(table_df, use_container_width=True)
 
